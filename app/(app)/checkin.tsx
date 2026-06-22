@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
 import { useChildren } from "@/lib/child-context";
 import { colors } from "@/lib/theme";
+import { tapHaptic, successHaptic } from "@/lib/haptics";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
 
 const EMOTIONS = [
@@ -42,6 +43,7 @@ export default function CheckInScreen() {
       Alert.alert("Error", error.message);
       setSaving(false);
     } else {
+      successHaptic();
       router.back();
     }
   }
@@ -75,7 +77,13 @@ export default function CheckInScreen() {
               return (
                 <Pressable
                   key={e.id}
-                  onPress={() => setSelected(e.id)}
+                  onPress={() => {
+                    tapHaptic();
+                    setSelected(e.id);
+                  }}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
+                  accessibilityLabel={`Feeling ${e.label}`}
                   style={{ width: "48%", marginBottom: 14 }}
                 >
                   <LinearGradient

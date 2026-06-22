@@ -1,5 +1,7 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { StyleSheet } from "react-native";
 import { ChildProvider } from "@/lib/child-context";
 import { colors } from "@/lib/theme";
 
@@ -14,9 +16,16 @@ export default function AppLayout() {
           tabBarStyle: {
             position: "absolute",
             borderTopWidth: 0,
-            backgroundColor: "rgba(255,255,255,0.92)",
+            backgroundColor: "transparent",
             elevation: 0,
           },
+          tabBarBackground: () => (
+            <BlurView
+              tint="light"
+              intensity={80}
+              style={StyleSheet.absoluteFill}
+            />
+          ),
           tabBarLabelStyle: { fontSize: 11, fontWeight: "500" },
         }}
       >

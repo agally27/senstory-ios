@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
 import { useChildren } from "@/lib/child-context";
 import { colors, metricColors } from "@/lib/theme";
+import { successHaptic } from "@/lib/haptics";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
 import { Card } from "@/components/ui/Card";
 import { MetricDotRow } from "@/components/ui/MetricDotRow";
@@ -93,7 +94,7 @@ export default function HomeScreen() {
       ? await supabase.from("daily_check_ins").update(payload).eq("id", existingId)
       : await supabase.from("daily_check_ins").insert(payload);
     if (error) Alert.alert("Error", error.message);
-    else { setLogged(true); loadCheckIn(); }
+    else { successHaptic(); setLogged(true); loadCheckIn(); }
     setSaving(false);
   }
 
@@ -165,7 +166,11 @@ export default function HomeScreen() {
 
           {/* Child photo */}
           <View className="items-center mb-4">
-            <Pressable onPress={pickPhoto}>
+            <Pressable
+              onPress={pickPhoto}
+              accessibilityRole="button"
+              accessibilityLabel={`${selectedChild.name}'s photo. Tap to change.`}
+            >
               <View
                 className="w-36 h-36 rounded-full overflow-hidden border-4 border-white"
                 style={{ shadowColor: "#0f172a", shadowOpacity: 0.15, shadowRadius: 16, shadowOffset: { width: 0, height: 6 } }}
