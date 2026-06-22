@@ -69,6 +69,7 @@ export default function AppLayout() {
         <Tabs.Screen name="add-child" options={{ href: null }} />
         <Tabs.Screen name="log-event" options={{ href: null }} />
         <Tabs.Screen name="checkin" options={{ href: null }} />
+        <Tabs.Screen name="strategy/[id]" options={{ href: null }} />
       </Tabs>
     </ChildProvider>
   );

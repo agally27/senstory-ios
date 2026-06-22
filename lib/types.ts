@@ -89,6 +89,7 @@ export interface Database {
           triggers: string[];
           sensory_factors: string[];
           strategies_tried: string[];
+          quick_tags: string[];
           outcome: EventOutcome;
           notes: string;
           created_at: string;

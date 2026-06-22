@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,12 +9,14 @@ import {
 import { useRouter, useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { format } from "date-fns";
+import { format, isSameDay, addMonths, subMonths } from "date-fns";
 import { supabase } from "@/lib/supabase";
 import { useChildren } from "@/lib/child-context";
 import { colors } from "@/lib/theme";
+import { regulationStatus } from "@/lib/tracking";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
 import { Card } from "@/components/ui/Card";
+import { MonthCalendar } from "@/components/ui/MonthCalendar";
 import type { ObservationEvent, ObservationType } from "@/lib/types";
 
 const TYPE_LABELS: Record<ObservationType, string> = {
@@ -44,11 +46,63 @@ const TYPE_COLORS: Partial<Record<ObservationType, string>> = {
   anxiety: colors.amber[400],
 };
 
+type Section = "entries" | "calendar";
+
+function EntryCard({ item }: { item: ObservationEvent }) {
+  const color = TYPE_COLORS[item.type] ?? colors.emerald[500];
+  const date = new Date(item.occurred_at);
+  const status = regulationStatus(item.regulation_after);
+  return (
+    <Card className="p-4 mb-3">
+      <View className="flex-row items-start justify-between">
+        <View className="flex-1">
+          <View className="flex-row items-center gap-2 mb-1">
+            <View className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+            <Text className="font-semibold text-slate-800">{TYPE_LABELS[item.type]}</Text>
+          </View>
+          <Text className="text-xs text-slate-400">
+            {format(date, "EEE, d MMM")} · {format(date, "HH:mm")}
+          </Text>
+          {item.notes ? (
+            <Text className="text-sm text-slate-600 mt-2 leading-snug">{item.notes}</Text>
+          ) : null}
+          {/* Tags + status */}
+          {(item.quick_tags?.length > 0 || status) && (
+            <View className="flex-row flex-wrap gap-1.5 mt-2">
+              {status && (
+                <View className={`px-2 py-1 rounded-full ${status.bg}`}>
+                  <Text className={`text-[11px] font-medium ${status.text}`}>{status.label}</Text>
+                </View>
+              )}
+              {item.quick_tags?.map((tag) => (
+                <View key={tag} className="px-2 py-1 rounded-full bg-slate-100">
+                  <Text className="text-[11px] text-slate-500">{tag}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+        {item.intensity != null && (
+          <View className="ml-3 items-center">
+            <Text className="text-xs text-slate-400">intensity</Text>
+            <Text className="font-bold text-lg" style={{ color }}>
+              {item.intensity}/5
+            </Text>
+          </View>
+        )}
+      </View>
+    </Card>
+  );
+}
+
 export default function TrackScreen() {
   const router = useRouter();
   const { selectedChild, selectedChildId } = useChildren();
   const [events, setEvents] = useState<ObservationEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [section, setSection] = useState<Section>("entries");
+  const [month, setMonth] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState(new Date());
 
   const loadEvents = useCallback(async () => {
     if (!selectedChildId) {
@@ -61,17 +115,24 @@ export default function TrackScreen() {
       .select("*")
       .eq("child_id", selectedChildId)
       .order("occurred_at", { ascending: false })
-      .limit(100);
+      .limit(200);
     setEvents((data ?? []) as ObservationEvent[]);
     setLoading(false);
   }, [selectedChildId]);
 
   useFocusEffect(useCallback(() => { loadEvents(); }, [loadEvents]));
 
+  const markedDates = new Set(events.map((e) => format(new Date(e.occurred_at), "yyyy-MM-dd")));
+  const dayEvents = events.filter((e) => isSameDay(new Date(e.occurred_at), selectedDay));
+
+  const SECTIONS: { id: Section; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+    { id: "entries", label: "All Entries", icon: "list" },
+    { id: "calendar", label: "Calendar", icon: "calendar" },
+  ];
+
   return (
     <ScreenBackground>
       <SafeAreaView className="flex-1" edges={["top"]}>
-        {/* Header */}
         <View className="px-4 mt-2 mb-4 flex-row items-center justify-between">
           <View>
             <Text className="text-2xl font-bold text-slate-800 font-heading">Track</Text>
@@ -88,6 +149,30 @@ export default function TrackScreen() {
           </Pressable>
         </View>
 
+        {/* Section pills */}
+        <View className="flex-row gap-2 px-4 mb-3">
+          {SECTIONS.map((s) => (
+            <Pressable
+              key={s.id}
+              onPress={() => setSection(s.id)}
+              className={`flex-row items-center gap-2 px-4 py-2 rounded-full border ${
+                section === s.id
+                  ? "bg-emerald-100 border-emerald-200"
+                  : "bg-white/70 border-slate-200"
+              }`}
+            >
+              <Ionicons
+                name={s.icon}
+                size={15}
+                color={section === s.id ? colors.emerald[700] : colors.slate[400]}
+              />
+              <Text className={`text-sm font-medium ${section === s.id ? "text-emerald-800" : "text-slate-500"}`}>
+                {s.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
         {loading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color={colors.emerald[500]} />
@@ -98,6 +183,34 @@ export default function TrackScreen() {
               Add a child on the Home tab to start tracking.
             </Text>
           </View>
+        ) : section === "calendar" ? (
+          <FlatList
+            data={dayEvents}
+            keyExtractor={(item) => item.id}
+            contentContainerClassName="px-4 pb-32"
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              <View className="mb-3">
+                <MonthCalendar
+                  month={month}
+                  selected={selectedDay}
+                  markedDates={markedDates}
+                  onSelect={setSelectedDay}
+                  onPrev={() => setMonth((m) => subMonths(m, 1))}
+                  onNext={() => setMonth((m) => addMonths(m, 1))}
+                />
+                <Text className="text-sm font-semibold text-slate-500 mt-4 mb-1 px-1">
+                  {format(selectedDay, "EEEE, d MMMM")}
+                </Text>
+              </View>
+            }
+            ListEmptyComponent={
+              <Text className="text-slate-400 text-center mt-4 px-8">
+                No entries on this day.
+              </Text>
+            }
+            renderItem={({ item }) => <EntryCard item={item} />}
+          />
         ) : events.length === 0 ? (
           <View className="flex-1 items-center justify-center px-8">
             <Ionicons name="document-text-outline" size={48} color={colors.slate[300]} />
@@ -118,40 +231,7 @@ export default function TrackScreen() {
             windowSize={7}
             initialNumToRender={10}
             removeClippedSubviews
-            renderItem={({ item }) => {
-              const color = TYPE_COLORS[item.type] ?? colors.emerald[500];
-              const date = new Date(item.occurred_at);
-              return (
-                <Card className="p-4 mb-3">
-                  <View className="flex-row items-start justify-between">
-                    <View className="flex-1">
-                      <View className="flex-row items-center gap-2 mb-1">
-                        <View className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-                        <Text className="font-semibold text-slate-800">
-                          {TYPE_LABELS[item.type]}
-                        </Text>
-                      </View>
-                      <Text className="text-xs text-slate-400">
-                        {format(date, "EEE, d MMM")} · {format(date, "HH:mm")}
-                      </Text>
-                      {item.notes ? (
-                        <Text className="text-sm text-slate-600 mt-2 leading-snug">
-                          {item.notes}
-                        </Text>
-                      ) : null}
-                    </View>
-                    {item.intensity != null && (
-                      <View className="ml-3 items-center">
-                        <Text className="text-xs text-slate-400">intensity</Text>
-                        <Text className="font-bold text-lg" style={{ color }}>
-                          {item.intensity}/5
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                </Card>
-              );
-            }}
+            renderItem={({ item }) => <EntryCard item={item} />}
           />
         )}
       </SafeAreaView>

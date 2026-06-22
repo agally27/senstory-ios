@@ -17,6 +17,7 @@ import { useChildren } from "@/lib/child-context";
 import { colors } from "@/lib/theme";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
 import { Card } from "@/components/ui/Card";
+import { QUICK_TAGS } from "@/lib/tracking";
 import type { ObservationType, EventOutcome } from "@/lib/types";
 
 const EVENT_TYPES: { value: ObservationType; label: string }[] = [
@@ -79,7 +80,14 @@ export default function LogEventScreen() {
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
   const [outcome, setOutcome] = useState<EventOutcome>("unknown");
+  const [tags, setTags] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+
+  function toggleTag(tag: string) {
+    setTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  }
 
   async function save() {
     if (!selectedChildId) return;
@@ -97,6 +105,7 @@ export default function LogEventScreen() {
       location: location || null,
       notes,
       outcome,
+      quick_tags: tags,
     });
     if (error) {
       Alert.alert("Error", error.message);
@@ -171,6 +180,26 @@ export default function LogEventScreen() {
               value={location}
               onChangeText={setLocation}
             />
+
+            <Text className="text-sm font-medium text-slate-700 mb-2">Quick tags</Text>
+            <View className="flex-row flex-wrap gap-2 mb-5">
+              {QUICK_TAGS.map((tag) => {
+                const on = tags.includes(tag);
+                return (
+                  <Pressable
+                    key={tag}
+                    onPress={() => toggleTag(tag)}
+                    className={`px-3 py-1.5 rounded-full border ${
+                      on ? "bg-sky-100 border-sky-200" : "bg-white/70 border-slate-200"
+                    }`}
+                  >
+                    <Text className={`text-xs font-medium ${on ? "text-sky-700" : "text-slate-500"}`}>
+                      {tag}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
 
             <Text className="text-sm font-medium text-slate-700 mb-1">Notes</Text>
             <TextInput
