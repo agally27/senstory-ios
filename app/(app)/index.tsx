@@ -27,7 +27,9 @@ const QUICK_LINKS = [
   { label: "Daily Log", route: "/(app)/track", icon: "calendar" as const, colors: [colors.emerald[100], colors.teal[100]] as const, iconColor: colors.emerald[600] },
   { label: "AI Insights", route: "/(app)/insights", icon: "trending-up" as const, colors: [colors.purple[100], colors.violet[100]] as const, iconColor: colors.purple[600] },
   { label: "Check-in", route: "/(app)/checkin", icon: "happy" as const, colors: [colors.rose[100], colors.rose[200]] as const, iconColor: colors.rose[600] },
-  { label: "Support", route: "/(app)/support", icon: "heart" as const, colors: [colors.amber[100], colors.amber[200]] as const, iconColor: colors.amber[600] },
+  { label: "Visual Symbols", route: "/(app)/visual-symbols", icon: "grid" as const, colors: [colors.sky[100], colors.sky[200]] as const, iconColor: colors.sky[600] },
+  { label: "Social Stories", route: "/(app)/stories", icon: "book" as const, colors: [colors.amber[100], colors.amber[200]] as const, iconColor: colors.amber[600] },
+  { label: "Support", route: "/(app)/support", icon: "heart" as const, colors: [colors.rose[100], colors.rose[200]] as const, iconColor: colors.rose[600] },
 ];
 
 function summaryLabel(avg: number) {

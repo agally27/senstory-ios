@@ -65,11 +65,23 @@ export default function AppLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="stories"
+          options={{
+            title: "Stories",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="book-outline" size={size} color={color} />
+            ),
+          }}
+        />
         {/* Modal / detail routes hidden from the tab bar */}
         <Tabs.Screen name="add-child" options={{ href: null }} />
         <Tabs.Screen name="log-event" options={{ href: null }} />
         <Tabs.Screen name="checkin" options={{ href: null }} />
         <Tabs.Screen name="strategy/[id]" options={{ href: null }} />
+        <Tabs.Screen name="visual-symbols" options={{ href: null }} />
+        <Tabs.Screen name="story-builder" options={{ href: null }} />
+        <Tabs.Screen name="story/[id]" options={{ href: null }} />
       </Tabs>
     </ChildProvider>
   );
