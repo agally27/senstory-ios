@@ -5,9 +5,9 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
-  Image,
   Alert,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -176,7 +176,12 @@ export default function HomeScreen() {
                 style={{ shadowColor: "#0f172a", shadowOpacity: 0.15, shadowRadius: 16, shadowOffset: { width: 0, height: 6 } }}
               >
                 {selectedChild.photo_url ? (
-                  <Image source={{ uri: selectedChild.photo_url }} className="w-full h-full" />
+                  <Image
+                    source={{ uri: selectedChild.photo_url }}
+                    style={{ width: "100%", height: "100%" }}
+                    contentFit="cover"
+                    transition={200}
+                  />
                 ) : (
                   <View className="w-full h-full bg-emerald-100 items-center justify-center">
                     <Text className="text-5xl font-semibold text-emerald-400">

@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
-  ScrollView,
+  FlatList,
   Pressable,
   ActivityIndicator,
 } from "react-native";
@@ -110,12 +110,19 @@ export default function TrackScreen() {
             </Pressable>
           </View>
         ) : (
-          <ScrollView contentContainerClassName="px-4 pb-32" showsVerticalScrollIndicator={false}>
-            {events.map((item) => {
+          <FlatList
+            data={events}
+            keyExtractor={(item) => item.id}
+            contentContainerClassName="px-4 pb-32"
+            showsVerticalScrollIndicator={false}
+            windowSize={7}
+            initialNumToRender={10}
+            removeClippedSubviews
+            renderItem={({ item }) => {
               const color = TYPE_COLORS[item.type] ?? colors.emerald[500];
               const date = new Date(item.occurred_at);
               return (
-                <Card key={item.id} className="p-4 mb-3">
+                <Card className="p-4 mb-3">
                   <View className="flex-row items-start justify-between">
                     <View className="flex-1">
                       <View className="flex-row items-center gap-2 mb-1">
@@ -144,8 +151,8 @@ export default function TrackScreen() {
                   </View>
                 </Card>
               );
-            })}
-          </ScrollView>
+            }}
+          />
         )}
       </SafeAreaView>
     </ScreenBackground>
