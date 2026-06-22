@@ -52,7 +52,7 @@ export default function SignUpScreen() {
             contentContainerClassName="justify-center px-6 py-12 flex-grow"
             keyboardShouldPersistTaps="handled"
           >
-            <Text className="text-4xl font-bold text-emerald-800 mb-2">Create account</Text>
+            <Text className="text-4xl font-bold text-emerald-800 mb-2 font-heading">Create account</Text>
             <Text className="text-slate-500 mb-10">Join Senstory to start tracking.</Text>
 
             <Text className="text-sm font-medium text-slate-700 mb-1">Your name</Text>

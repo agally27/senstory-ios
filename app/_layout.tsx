@@ -2,7 +2,11 @@ import "../global.css";
 import { useEffect, useState } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { Session } from "@supabase/supabase-js";
+import { useFonts } from "expo-font";
 import { supabase } from "@/lib/supabase";
+import { fontMap, applyGlobalFont } from "@/lib/fonts";
+
+applyGlobalFont();
 
 function useAuthGuard(session: Session | null, loading: boolean) {
   const segments = useSegments();
@@ -22,6 +26,7 @@ function useAuthGuard(session: Session | null, loading: boolean) {
 export default function RootLayout() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fontsLoaded] = useFonts(fontMap);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -36,7 +41,7 @@ export default function RootLayout() {
 
   useAuthGuard(session, loading);
 
-  if (loading) return null;
+  if (loading || !fontsLoaded) return null;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

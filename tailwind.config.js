@@ -19,7 +19,10 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["System"],
+        // Body text uses Nunito Sans (applied globally via the Text
+        // interceptor in lib/fonts.ts). Headings use Varela Round.
+        heading: ["VarelaRound_400Regular"],
+        sans: ["NunitoSans_400Regular"],
       },
     },
   },

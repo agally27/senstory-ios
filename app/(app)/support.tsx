@@ -34,7 +34,7 @@ export default function SupportScreen() {
     <ScreenBackground>
       <SafeAreaView className="flex-1" edges={["top"]}>
         <View className="px-4 mt-2 mb-4">
-          <Text className="text-2xl font-bold text-slate-800">Support</Text>
+          <Text className="text-2xl font-bold text-slate-800 font-heading">Support</Text>
           <Text className="text-sm text-slate-500">Manage your family & account</Text>
         </View>
 

@@ -55,7 +55,7 @@ export default function CheckInScreen() {
           <Pressable onPress={() => router.back()}>
             <Ionicons name="close" size={26} color={colors.slate[700]} />
           </Pressable>
-          <Text className="text-xl font-bold text-slate-800">Check-in</Text>
+          <Text className="text-xl font-bold text-slate-800 font-heading">Check-in</Text>
         </View>
 
         <ScrollView contentContainerClassName="px-4 pb-8" showsVerticalScrollIndicator={false}>
@@ -63,7 +63,7 @@ export default function CheckInScreen() {
             <View className="w-20 h-20 rounded-full bg-rose-100 items-center justify-center mb-4">
               <Ionicons name="heart" size={36} color={colors.rose[500]} />
             </View>
-            <Text className="text-2xl font-bold text-slate-800 mb-1">
+            <Text className="text-2xl font-bold text-slate-800 mb-1 font-heading">
               How are you feeling?
             </Text>
             <Text className="text-slate-500">

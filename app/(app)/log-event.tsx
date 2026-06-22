@@ -117,7 +117,7 @@ export default function LogEventScreen() {
             <Pressable onPress={() => router.back()}>
               <Ionicons name="close" size={26} color={colors.slate[700]} />
             </Pressable>
-            <Text className="text-xl font-bold text-slate-800">Log entry</Text>
+            <Text className="text-xl font-bold text-slate-800 font-heading">Log entry</Text>
           </View>
 
           <ScrollView className="flex-1 px-4" keyboardShouldPersistTaps="handled">

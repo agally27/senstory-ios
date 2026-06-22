@@ -74,7 +74,7 @@ export default function TrackScreen() {
         {/* Header */}
         <View className="px-4 mt-2 mb-4 flex-row items-center justify-between">
           <View>
-            <Text className="text-2xl font-bold text-slate-800">Track</Text>
+            <Text className="text-2xl font-bold text-slate-800 font-heading">Track</Text>
             <Text className="text-sm text-slate-500">
               {selectedChild ? `${selectedChild.name}'s daily log` : "Daily logging"}
             </Text>

@@ -57,7 +57,7 @@ export default function AddChildScreen() {
             <Pressable onPress={() => router.back()}>
               <Ionicons name="arrow-back" size={24} color={colors.slate[700]} />
             </Pressable>
-            <Text className="text-xl font-bold text-slate-800">Add a child</Text>
+            <Text className="text-xl font-bold text-slate-800 font-heading">Add a child</Text>
           </View>
 
           <ScrollView className="flex-1 px-4" keyboardShouldPersistTaps="handled">

@@ -50,7 +50,7 @@ export default function InsightsScreen() {
     <ScreenBackground>
       <SafeAreaView className="flex-1" edges={["top"]}>
         <View className="px-4 mt-2 mb-4">
-          <Text className="text-2xl font-bold text-slate-800">AI Insights</Text>
+          <Text className="text-2xl font-bold text-slate-800 font-heading">AI Insights</Text>
           <Text className="text-sm text-slate-500">
             {selectedChild ? `Patterns for ${selectedChild.name}` : "Patterns from your logs"}
           </Text>

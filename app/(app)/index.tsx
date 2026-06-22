@@ -132,7 +132,7 @@ export default function HomeScreen() {
       <ScreenBackground>
         <SafeAreaView className="flex-1 items-center justify-center px-8">
           <Ionicons name="sunny" size={56} color={colors.emerald[400]} />
-          <Text className="text-xl font-bold text-slate-800 mt-4 mb-2">
+          <Text className="text-xl font-bold text-slate-800 mt-4 mb-2 font-heading">
             Welcome to Senstory
           </Text>
           <Text className="text-slate-500 text-center mb-6">

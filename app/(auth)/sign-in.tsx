@@ -34,7 +34,7 @@ export default function SignInScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           <View className="flex-1 justify-center px-6">
-            <Text className="text-4xl font-bold text-emerald-800 mb-2">Senstory</Text>
+            <Text className="text-4xl font-bold text-emerald-800 mb-2 font-heading">Senstory</Text>
             <Text className="text-slate-500 mb-10">
               Supporting your family, one day at a time.
             </Text>
