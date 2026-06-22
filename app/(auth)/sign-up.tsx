@@ -3,14 +3,17 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   KeyboardAvoidingView,
   Platform,
   Alert,
   ScrollView,
 } from "react-native";
 import { Link } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "@/lib/supabase";
+import { colors } from "@/lib/theme";
+import { ScreenBackground } from "@/components/ui/ScreenBackground";
 
 export default function SignUpScreen() {
   const [name, setName] = useState("");
@@ -38,64 +41,71 @@ export default function SignUpScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-white"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="justify-center px-6 py-12"
-        keyboardShouldPersistTaps="handled"
-      >
-        <Text className="text-3xl font-bold text-brand-800 mb-2">Create account</Text>
-        <Text className="text-gray-500 mb-10">Join Senstory to start tracking.</Text>
-
-        <Text className="text-sm font-medium text-gray-700 mb-1">Your name</Text>
-        <TextInput
-          className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-base text-gray-900"
-          placeholder="Alex Smith"
-          value={name}
-          onChangeText={setName}
-        />
-
-        <Text className="text-sm font-medium text-gray-700 mb-1">Email</Text>
-        <TextInput
-          className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-base text-gray-900"
-          placeholder="you@example.com"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        <Text className="text-sm font-medium text-gray-700 mb-1">Password</Text>
-        <TextInput
-          className="border border-gray-300 rounded-xl px-4 py-3 mb-6 text-base text-gray-900"
-          placeholder="At least 8 characters"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        <TouchableOpacity
-          className={`bg-brand-600 rounded-xl py-4 items-center ${loading ? "opacity-60" : ""}`}
-          onPress={handleSignUp}
-          disabled={loading}
+    <ScreenBackground>
+      <SafeAreaView className="flex-1">
+        <KeyboardAvoidingView
+          className="flex-1"
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <Text className="text-white font-semibold text-base">
-            {loading ? "Creating account…" : "Create account"}
-          </Text>
-        </TouchableOpacity>
+          <ScrollView
+            className="flex-1"
+            contentContainerClassName="justify-center px-6 py-12 flex-grow"
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text className="text-4xl font-bold text-emerald-800 mb-2">Create account</Text>
+            <Text className="text-slate-500 mb-10">Join Senstory to start tracking.</Text>
 
-        <View className="flex-row justify-center mt-6">
-          <Text className="text-gray-500">Already have an account? </Text>
-          <Link href="/(auth)/sign-in" asChild>
-            <TouchableOpacity>
-              <Text className="text-brand-600 font-medium">Sign in</Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <Text className="text-sm font-medium text-slate-700 mb-1">Your name</Text>
+            <TextInput
+              className="bg-white/80 border border-slate-200 rounded-2xl px-4 py-3.5 mb-4 text-base text-slate-900"
+              placeholder="Alex Smith"
+              placeholderTextColor={colors.slate[400]}
+              value={name}
+              onChangeText={setName}
+            />
+
+            <Text className="text-sm font-medium text-slate-700 mb-1">Email</Text>
+            <TextInput
+              className="bg-white/80 border border-slate-200 rounded-2xl px-4 py-3.5 mb-4 text-base text-slate-900"
+              placeholder="you@example.com"
+              placeholderTextColor={colors.slate[400]}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
+
+            <Text className="text-sm font-medium text-slate-700 mb-1">Password</Text>
+            <TextInput
+              className="bg-white/80 border border-slate-200 rounded-2xl px-4 py-3.5 mb-6 text-base text-slate-900"
+              placeholder="At least 8 characters"
+              placeholderTextColor={colors.slate[400]}
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+
+            <Pressable
+              className={`bg-emerald-500 rounded-full py-4 items-center ${loading ? "opacity-60" : ""}`}
+              onPress={handleSignUp}
+              disabled={loading}
+            >
+              <Text className="text-white font-semibold text-base">
+                {loading ? "Creating account…" : "Create account"}
+              </Text>
+            </Pressable>
+
+            <View className="flex-row justify-center mt-6">
+              <Text className="text-slate-500">Already have an account? </Text>
+              <Link href="/(auth)/sign-in" asChild>
+                <Pressable>
+                  <Text className="text-emerald-600 font-medium">Sign in</Text>
+                </Pressable>
+              </Link>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </ScreenBackground>
   );
 }

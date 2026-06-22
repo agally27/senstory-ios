@@ -44,6 +44,7 @@ export interface Database {
           owner_id: string;
           name: string;
           date_of_birth: string | null;
+          photo_url: string | null;
           about_me: string;
           strengths_interests: string;
           communication_notes: string;
@@ -173,3 +174,12 @@ export type Child = Database["public"]["Tables"]["children"]["Row"];
 export type ObservationEvent = Database["public"]["Tables"]["observation_events"]["Row"];
 export type DailyCheckIn = Database["public"]["Tables"]["daily_check_ins"]["Row"];
 export type Insight = Database["public"]["Tables"]["insights"]["Row"];
+
+export interface EmotionCheckIn {
+  id: string;
+  child_id: string;
+  created_by_id: string;
+  emotion: string;
+  date: string;
+  created_at: string;
+}
