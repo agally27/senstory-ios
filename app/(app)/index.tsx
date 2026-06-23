@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -24,6 +25,7 @@ import { Card } from "@/components/ui/Card";
 import { MetricDotRow } from "@/components/ui/MetricDotRow";
 import { GradientIconTile } from "@/components/ui/GradientIconTile";
 import { GradientButton } from "@/components/ui/GradientButton";
+import { PressableCard } from "@/components/ui/PressableCard";
 import { LineChart } from "@/components/ui/charts";
 import type { DailyCheckIn, ObservationEvent } from "@/lib/types";
 
@@ -76,6 +78,13 @@ export default function HomeScreen() {
   const [logged, setLogged] = useState(false);
   const [history, setHistory] = useState<DailyCheckIn[]>([]);
   const [recent, setRecent] = useState<ObservationEvent[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await Promise.all([loadCheckIn(), loadHistory(), loadRecent(), refresh()]);
+    setRefreshing(false);
+  }
 
   const today = format(new Date(), "yyyy-MM-dd");
   const chartWidth = Dimensions.get("window").width - 32 - 40;
@@ -173,7 +182,11 @@ export default function HomeScreen() {
   return (
     <ScreenBackground>
       <SafeAreaView className="flex-1" edges={["top"]}>
-        <ScrollView contentContainerClassName="px-4 pb-32" showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerClassName="px-4 pb-32"
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.emerald[400]} />}
+        >
           {/* Header: wordmark + utilities */}
           <View className="flex-row items-center justify-between mt-2 mb-5">
             <View>
@@ -270,18 +283,16 @@ export default function HomeScreen() {
 
           {/* Recommendation */}
           <Text className="text-lg text-slate-800 font-heading mb-2 mt-1">Recommended for you</Text>
-          <Pressable onPress={() => router.push(`/(app)/strategy/${recommendation.id}`)}>
-            <Card className="p-5 mb-4 flex-row items-center gap-3">
-              <View className={`w-12 h-12 rounded-2xl items-center justify-center ${recommendation.bg}`}>
-                <Ionicons name={recommendation.icon} size={24} color={recommendation.tint} />
-              </View>
-              <View className="flex-1">
-                <Text className="font-semibold text-slate-800">{recommendation.title}</Text>
-                <Text className="text-xs text-slate-500 mt-0.5">{recommendation.summary}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={colors.slate[300]} />
-            </Card>
-          </Pressable>
+          <PressableCard onPress={() => router.push(`/(app)/strategy/${recommendation.id}`)} className="p-5 mb-4 flex-row items-center gap-3">
+            <View className={`w-12 h-12 rounded-2xl items-center justify-center ${recommendation.bg}`}>
+              <Ionicons name={recommendation.icon} size={24} color={recommendation.tint} />
+            </View>
+            <View className="flex-1">
+              <Text className="font-semibold text-slate-800">{recommendation.title}</Text>
+              <Text className="text-xs text-slate-500 mt-0.5">{recommendation.summary}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.slate[300]} />
+          </PressableCard>
 
           {/* Today's tip */}
           <Card className="p-5 mb-4 flex-row gap-3">

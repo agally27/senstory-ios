@@ -4,7 +4,7 @@ import {
   Text,
   FlatList,
   Pressable,
-  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,7 +14,9 @@ import { supabase } from "@/lib/supabase";
 import { useChildren } from "@/lib/child-context";
 import { colors } from "@/lib/theme";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
-import { Card } from "@/components/ui/Card";
+import { PressableCard } from "@/components/ui/PressableCard";
+import { SkeletonList } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface Story {
   id: string;
@@ -31,6 +33,7 @@ export default function StoriesScreen() {
   const { selectedChild, selectedChildId } = useChildren();
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [tab, setTab] = useState<"all" | "favourites">("all");
 
   const load = useCallback(async () => {
@@ -49,6 +52,12 @@ export default function StoriesScreen() {
   }, [selectedChildId]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  }
 
   async function toggleFavourite(story: Story) {
     await supabase.from("stories").update({ favourite: !story.favourite }).eq("id", story.id);
@@ -94,39 +103,34 @@ export default function StoriesScreen() {
         </View>
 
         {loading ? (
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color={colors.emerald[500]} />
-          </View>
+          <SkeletonList count={4} />
         ) : !selectedChild ? (
-          <View className="flex-1 items-center justify-center px-8">
-            <Text className="text-slate-400 text-center">
-              Add a child on the Home tab to create stories.
-            </Text>
-          </View>
+          <EmptyState
+            icon="person-add-outline"
+            title="No child yet"
+            subtitle="Add a child on the Home tab to create personalised social stories."
+          />
         ) : shown.length === 0 ? (
-          <View className="flex-1 items-center justify-center px-8">
-            <Ionicons name="book-outline" size={48} color={colors.slate[300]} />
-            <Text className="text-slate-400 text-center mt-4">
-              {tab === "favourites" ? "No favourites yet" : "No stories yet"}
-            </Text>
-            {tab === "all" && (
-              <Pressable
-                onPress={() => router.push("/(app)/story-builder")}
-                className="mt-6 bg-emerald-100 border border-emerald-200 rounded-full px-6 py-3"
-              >
-                <Text className="text-emerald-800 font-semibold">Create a story</Text>
-              </Pressable>
-            )}
-          </View>
+          <EmptyState
+            icon="book-outline"
+            title={tab === "favourites" ? "No favourites yet" : "No stories yet"}
+            subtitle={
+              tab === "favourites"
+                ? "Tap the star on a story to keep it here."
+                : "Create a calm, personalised social story for a moment that's tricky."
+            }
+            ctaLabel={tab === "all" ? "Create a story" : undefined}
+            onCta={tab === "all" ? () => router.push("/(app)/story-builder") : undefined}
+          />
         ) : (
           <FlatList
             data={shown}
             keyExtractor={(s) => s.id}
             contentContainerClassName="px-4 pb-32"
             showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.emerald[400]} />}
             renderItem={({ item }) => (
-              <Pressable onPress={() => router.push(`/(app)/story/${item.id}`)}>
-                <Card className="p-4 mb-3">
+              <PressableCard onPress={() => router.push(`/(app)/story/${item.id}`)} className="p-4 mb-3">
                   <View className="flex-row items-start gap-3">
                     <View className="w-12 h-12 rounded-2xl bg-amber-100 items-center justify-center">
                       <Ionicons name="book" size={22} color={colors.amber[600]} />
@@ -150,8 +154,7 @@ export default function StoriesScreen() {
                       />
                     </Pressable>
                   </View>
-                </Card>
-              </Pressable>
+                </PressableCard>
             )}
           />
         )}

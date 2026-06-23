@@ -8,6 +8,7 @@ import { colors } from "@/lib/theme";
 import { STRATEGIES } from "@/lib/strategies";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
 import { Card } from "@/components/ui/Card";
+import { PressableCard } from "@/components/ui/PressableCard";
 
 export default function SupportScreen() {
   const router = useRouter();
@@ -34,18 +35,16 @@ export default function SupportScreen() {
             Strategies
           </Text>
           {STRATEGIES.map((s) => (
-            <Pressable key={s.id} onPress={() => router.push(`/(app)/strategy/${s.id}`)}>
-              <Card className="p-4 mb-3 flex-row items-center gap-3">
-                <View className={`w-11 h-11 rounded-2xl items-center justify-center ${s.bg}`}>
-                  <Ionicons name={s.icon} size={22} color={s.tint} />
-                </View>
-                <View className="flex-1">
-                  <Text className="font-semibold text-slate-800">{s.title}</Text>
-                  <Text className="text-xs text-slate-500 mt-0.5">{s.summary}</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color={colors.slate[300]} />
-              </Card>
-            </Pressable>
+            <PressableCard key={s.id} onPress={() => router.push(`/(app)/strategy/${s.id}`)} className="p-4 mb-3 flex-row items-center gap-3">
+              <View className={`w-11 h-11 rounded-2xl items-center justify-center ${s.bg}`}>
+                <Ionicons name={s.icon} size={22} color={s.tint} />
+              </View>
+              <View className="flex-1">
+                <Text className="font-semibold text-slate-800">{s.title}</Text>
+                <Text className="text-xs text-slate-500 mt-0.5">{s.summary}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={colors.slate[300]} />
+            </PressableCard>
           ))}
 
           {/* Account */}

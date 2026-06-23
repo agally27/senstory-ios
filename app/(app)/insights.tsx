@@ -4,7 +4,7 @@ import {
   Text,
   ScrollView,
   Pressable,
-  ActivityIndicator,
+  RefreshControl,
   Dimensions,
 } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -17,6 +17,8 @@ import { colors, metricColors } from "@/lib/theme";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
 import { Card } from "@/components/ui/Card";
 import { GradientButton } from "@/components/ui/GradientButton";
+import { SkeletonList } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { LineChart, BarList, DonutChart } from "@/components/ui/charts";
 import type { Insight, DailyCheckIn, ObservationEvent } from "@/lib/types";
 
@@ -32,6 +34,7 @@ export default function InsightsScreen() {
   const [checkIns, setCheckIns] = useState<DailyCheckIn[]>([]);
   const [events, setEvents] = useState<ObservationEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const chartWidth = Dimensions.get("window").width - 32 - 40; // screen - page padding - card padding
 
@@ -53,6 +56,12 @@ export default function InsightsScreen() {
   }, [selectedChildId]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  }
 
   async function review(id: string, status: "confirmed" | "rejected") {
     await supabase.from("insights").update({ status, reviewed_at: new Date().toISOString() }).eq("id", id);
@@ -95,19 +104,21 @@ export default function InsightsScreen() {
         </View>
 
         {loading ? (
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color={colors.emerald[500]} />
-          </View>
+          <SkeletonList count={4} />
         ) : !hasAnyData ? (
-          <View className="flex-1 items-center justify-center px-8">
-            <Ionicons name="bulb-outline" size={48} color={colors.slate[300]} />
-            <Text className="text-slate-400 text-center mt-4 leading-relaxed">
-              No data yet. Log wellbeing and events — patterns and charts will
-              appear here as your advisor learns about {selectedChild?.name ?? "your child"}.
-            </Text>
-          </View>
+          <EmptyState
+            icon="bulb-outline"
+            title="No insights yet"
+            subtitle={`Log wellbeing and events, then tap Analyse — patterns will appear here as your advisor learns about ${selectedChild?.name ?? "your child"}.`}
+            ctaLabel="Analyse patterns"
+            onCta={() => router.push("/(app)/analyse")}
+          />
         ) : (
-          <ScrollView contentContainerClassName="px-4 pb-32" showsVerticalScrollIndicator={false}>
+          <ScrollView
+            contentContainerClassName="px-4 pb-32"
+            showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.emerald[400]} />}
+          >
             {/* Analyse CTA */}
             <View className="mb-4">
               <GradientButton

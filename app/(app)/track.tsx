@@ -4,7 +4,7 @@ import {
   Text,
   FlatList,
   Pressable,
-  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +17,8 @@ import { regulationStatus } from "@/lib/tracking";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
 import { Card } from "@/components/ui/Card";
 import { MonthCalendar } from "@/components/ui/MonthCalendar";
+import { SkeletonList } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { ObservationEvent, ObservationType } from "@/lib/types";
 
 const TYPE_LABELS: Record<ObservationType, string> = {
@@ -100,6 +102,7 @@ export default function TrackScreen() {
   const { selectedChild, selectedChildId } = useChildren();
   const [events, setEvents] = useState<ObservationEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [section, setSection] = useState<Section>("entries");
   const [month, setMonth] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -121,6 +124,16 @@ export default function TrackScreen() {
   }, [selectedChildId]);
 
   useFocusEffect(useCallback(() => { loadEvents(); }, [loadEvents]));
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await loadEvents();
+    setRefreshing(false);
+  }
+
+  const refreshControl = (
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.emerald[400]} />
+  );
 
   const markedDates = new Set(events.map((e) => format(new Date(e.occurred_at), "yyyy-MM-dd")));
   const dayEvents = events.filter((e) => isSameDay(new Date(e.occurred_at), selectedDay));
@@ -174,21 +187,20 @@ export default function TrackScreen() {
         </View>
 
         {loading ? (
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color={colors.emerald[500]} />
-          </View>
+          <SkeletonList count={5} />
         ) : !selectedChild ? (
-          <View className="flex-1 items-center justify-center px-8">
-            <Text className="text-slate-400 text-center">
-              Add a child on the Home tab to start tracking.
-            </Text>
-          </View>
+          <EmptyState
+            icon="person-add-outline"
+            title="No child yet"
+            subtitle="Add a child on the Home tab to start tracking their day."
+          />
         ) : section === "calendar" ? (
           <FlatList
             data={dayEvents}
             keyExtractor={(item) => item.id}
             contentContainerClassName="px-4 pb-32"
             showsVerticalScrollIndicator={false}
+            refreshControl={refreshControl}
             ListHeaderComponent={
               <View className="mb-3">
                 <MonthCalendar
@@ -212,16 +224,13 @@ export default function TrackScreen() {
             renderItem={({ item }) => <EntryCard item={item} />}
           />
         ) : events.length === 0 ? (
-          <View className="flex-1 items-center justify-center px-8">
-            <Ionicons name="document-text-outline" size={48} color={colors.slate[300]} />
-            <Text className="text-slate-400 text-center mt-4">No entries yet</Text>
-            <Pressable
-              onPress={() => router.push("/(app)/log-event")}
-              className="mt-6 bg-emerald-100 border border-emerald-200 rounded-full px-6 py-3"
-            >
-              <Text className="text-emerald-800 font-semibold">Log first entry</Text>
-            </Pressable>
-          </View>
+          <EmptyState
+            icon="document-text-outline"
+            title="No entries yet"
+            subtitle="Log a moment from the day — a calm patch, a wobble, a meal, anything worth remembering."
+            ctaLabel="Log first entry"
+            onCta={() => router.push("/(app)/log-event")}
+          />
         ) : (
           <FlatList
             data={events}
@@ -231,6 +240,7 @@ export default function TrackScreen() {
             windowSize={7}
             initialNumToRender={10}
             removeClippedSubviews
+            refreshControl={refreshControl}
             renderItem={({ item }) => <EntryCard item={item} />}
           />
         )}
