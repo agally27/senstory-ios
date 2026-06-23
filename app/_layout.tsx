@@ -5,6 +5,7 @@ import { Session } from "@supabase/supabase-js";
 import { useFonts } from "expo-font";
 import { supabase } from "@/lib/supabase";
 import { fontMap, applyGlobalFont } from "@/lib/fonts";
+import { ensureProfile } from "@/lib/ensure-profile";
 
 applyGlobalFont();
 
@@ -32,9 +33,13 @@ export default function RootLayout() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
+      if (session) ensureProfile();
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => setSession(session)
+      (_event, session) => {
+        setSession(session);
+        if (session) ensureProfile();
+      }
     );
     return () => subscription.unsubscribe();
   }, []);
