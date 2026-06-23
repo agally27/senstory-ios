@@ -35,8 +35,18 @@ export const colors = {
   white: "#ffffff",
 };
 
-// Background gradient for app screens (soft emerald → sky wash)
-export const screenGradient = ["#ecfdf5", "#f0f9ff"] as const;
+// Background gradient for app screens (soft sky → white wash, Calm/Flo style)
+export const screenGradient = ["#e0f2fe", "#f0f9ff", "#ffffff"] as const;
+
+// Gradient presets for buttons, tiles, accents.
+export const gradients = {
+  primary: ["#34d399", "#0ea5e9"] as const, // emerald → sky
+  emerald: ["#34d399", "#10b981"] as const,
+  sky: ["#38bdf8", "#0284c7"] as const,
+  rose: ["#fb7185", "#f43f5e"] as const,
+  amber: ["#fbbf24", "#f59e0b"] as const,
+  violet: ["#a78bfa", "#7c3aed"] as const,
+};
 
 // Metric row colours (Home wellbeing loggers)
 export const metricColors = {
