@@ -17,7 +17,7 @@ function useAuthGuard(session: Session | null, loading: boolean) {
     if (loading) return;
     const inAuth = segments[0] === "(auth)";
     if (!session && !inAuth) {
-      router.replace("/(auth)/sign-in");
+      router.replace("/(auth)/onboarding");
     } else if (session && inAuth) {
       router.replace("/(app)");
     }

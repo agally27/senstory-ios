@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "@/lib/supabase";
 import { colors } from "@/lib/theme";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
+import { GradientButton } from "@/components/ui/GradientButton";
 
 export default function SignUpScreen() {
   const [name, setName] = useState("");
@@ -85,15 +86,7 @@ export default function SignUpScreen() {
               onChangeText={setPassword}
             />
 
-            <Pressable
-              className={`bg-emerald-500 rounded-full py-4 items-center ${loading ? "opacity-60" : ""}`}
-              onPress={handleSignUp}
-              disabled={loading}
-            >
-              <Text className="text-white font-semibold text-base">
-                {loading ? "Creating account…" : "Create account"}
-              </Text>
-            </Pressable>
+            <GradientButton label="Create account" onPress={handleSignUp} loading={loading} />
 
             <View className="flex-row justify-center mt-6">
               <Text className="text-slate-500">Already have an account? </Text>

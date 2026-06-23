@@ -82,6 +82,7 @@ export default function AppLayout() {
         <Tabs.Screen name="visual-symbols" options={{ href: null, tabBarStyle: { display: "none" } }} />
         <Tabs.Screen name="story-builder" options={{ href: null, tabBarStyle: { display: "none" } }} />
         <Tabs.Screen name="story/[id]" options={{ href: null, tabBarStyle: { display: "none" } }} />
+        <Tabs.Screen name="analyse" options={{ href: null, tabBarStyle: { display: "none" } }} />
       </Tabs>
     </ChildProvider>
   );

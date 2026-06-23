@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from "react-native";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
@@ -16,6 +16,7 @@ import { useChildren } from "@/lib/child-context";
 import { colors, metricColors } from "@/lib/theme";
 import { ScreenBackground } from "@/components/ui/ScreenBackground";
 import { Card } from "@/components/ui/Card";
+import { GradientButton } from "@/components/ui/GradientButton";
 import { LineChart, BarList, DonutChart } from "@/components/ui/charts";
 import type { Insight, DailyCheckIn, ObservationEvent } from "@/lib/types";
 
@@ -25,6 +26,7 @@ const DONUT_COLORS = [
 ];
 
 export default function InsightsScreen() {
+  const router = useRouter();
   const { selectedChild, selectedChildId } = useChildren();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [checkIns, setCheckIns] = useState<DailyCheckIn[]>([]);
@@ -106,6 +108,16 @@ export default function InsightsScreen() {
           </View>
         ) : (
           <ScrollView contentContainerClassName="px-4 pb-32" showsVerticalScrollIndicator={false}>
+            {/* Analyse CTA */}
+            <View className="mb-4">
+              <GradientButton
+                label="Analyse patterns"
+                icon="sparkles"
+                variant="violet"
+                onPress={() => router.push("/(app)/analyse")}
+              />
+            </View>
+
             {/* Wellbeing trend */}
             {hasTrend && (
               <Card className="p-5 mb-3">
