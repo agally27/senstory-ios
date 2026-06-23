@@ -21,7 +21,17 @@ import { ScreenBackground } from "@/components/ui/ScreenBackground";
 import { Card } from "@/components/ui/Card";
 import { MetricDotRow } from "@/components/ui/MetricDotRow";
 import { GradientIconTile } from "@/components/ui/GradientIconTile";
+import { LineChart } from "@/components/ui/charts";
 import type { DailyCheckIn } from "@/lib/types";
+import { Dimensions } from "react-native";
+
+const TIPS = [
+  "Logging little and often beats trying to capture everything — a quick check-in each day builds the clearest picture.",
+  "Notice the calm moments too. What was happening when your child felt regulated is just as useful as the hard times.",
+  "Big feelings pass like waves. Staying calm yourself is often the most powerful co-regulation tool you have.",
+  "Patterns take time to appear. A week or two of check-ins and your Insights tab starts to come alive.",
+  "Transitions are easier with warning. A countdown or a visual cue can soften the jump between activities.",
+];
 
 const QUICK_LINKS = [
   { label: "Daily Log", route: "/(app)/track", icon: "calendar" as const, colors: [colors.emerald[100], colors.teal[100]] as const, iconColor: colors.emerald[600] },
@@ -49,15 +59,29 @@ export default function HomeScreen() {
   const [existingId, setExistingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [logged, setLogged] = useState(false);
+  const [history, setHistory] = useState<DailyCheckIn[]>([]);
 
   const today = format(new Date(), "yyyy-MM-dd");
+  const chartWidth = Dimensions.get("window").width - 32 - 40;
+  const tip = TIPS[new Date().getDate() % TIPS.length];
 
   useEffect(() => {
     if (!selectedChildId) return;
     setLogged(false);
     setExistingId(null);
     loadCheckIn();
+    loadHistory();
   }, [selectedChildId]);
+
+  async function loadHistory() {
+    const { data } = await supabase
+      .from("daily_check_ins")
+      .select("*")
+      .eq("child_id", selectedChildId)
+      .order("date", { ascending: true })
+      .limit(14);
+    setHistory((data ?? []) as DailyCheckIn[]);
+  }
 
   async function loadCheckIn() {
     const { data } = (await supabase
@@ -96,7 +120,7 @@ export default function HomeScreen() {
       ? await supabase.from("daily_check_ins").update(payload).eq("id", existingId)
       : await supabase.from("daily_check_ins").insert(payload);
     if (error) Alert.alert("Error", error.message);
-    else { successHaptic(); setLogged(true); loadCheckIn(); }
+    else { successHaptic(); setLogged(true); loadCheckIn(); loadHistory(); }
     setSaving(false);
   }
 
@@ -243,6 +267,47 @@ export default function HomeScreen() {
               </Text>
             </Pressable>
           </Card>
+
+          {/* Today's tip */}
+          <Card className="p-5 mb-4 flex-row gap-3">
+            <View className="w-9 h-9 rounded-xl bg-amber-100 items-center justify-center">
+              <Ionicons name="bulb" size={18} color={colors.amber[600]} />
+            </View>
+            <View className="flex-1">
+              <Text className="text-sm font-semibold text-slate-700 mb-1">Today's tip</Text>
+              <Text className="text-sm text-slate-500 leading-relaxed">{tip}</Text>
+            </View>
+          </Card>
+
+          {/* Wellbeing trend */}
+          {history.length >= 2 && (
+            <Card className="p-5 mb-4">
+              <Text className="text-sm font-semibold text-slate-700 mb-1">Wellbeing</Text>
+              <Text className="text-xs text-slate-400 mb-3">Last {history.length} check-ins</Text>
+              <LineChart
+                width={chartWidth}
+                series={[
+                  { color: metricColors.regulation, values: history.map((c) => c.regulation ?? 0) },
+                  { color: metricColors.sleep, values: history.map((c) => c.sleep ?? 0) },
+                  { color: metricColors.mood, values: history.map((c) => c.mood ?? 0) },
+                ]}
+              />
+              <View className="flex-row gap-4 mt-3">
+                <View className="flex-row items-center gap-1.5">
+                  <View className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: metricColors.regulation }} />
+                  <Text className="text-xs text-slate-500">Regulation</Text>
+                </View>
+                <View className="flex-row items-center gap-1.5">
+                  <View className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: metricColors.sleep }} />
+                  <Text className="text-xs text-slate-500">Sleep</Text>
+                </View>
+                <View className="flex-row items-center gap-1.5">
+                  <View className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: metricColors.mood }} />
+                  <Text className="text-xs text-slate-500">Mood</Text>
+                </View>
+              </View>
+            </Card>
+          )}
 
           {/* Quick links */}
           <View className="flex-row flex-wrap" style={{ gap: 12 }}>

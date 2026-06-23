@@ -75,13 +75,13 @@ export default function AppLayout() {
           }}
         />
         {/* Modal / detail routes hidden from the tab bar */}
-        <Tabs.Screen name="add-child" options={{ href: null }} />
-        <Tabs.Screen name="log-event" options={{ href: null }} />
-        <Tabs.Screen name="checkin" options={{ href: null }} />
-        <Tabs.Screen name="strategy/[id]" options={{ href: null }} />
-        <Tabs.Screen name="visual-symbols" options={{ href: null }} />
-        <Tabs.Screen name="story-builder" options={{ href: null }} />
-        <Tabs.Screen name="story/[id]" options={{ href: null }} />
+        <Tabs.Screen name="add-child" options={{ href: null, tabBarStyle: { display: "none" } }} />
+        <Tabs.Screen name="log-event" options={{ href: null, tabBarStyle: { display: "none" } }} />
+        <Tabs.Screen name="checkin" options={{ href: null, tabBarStyle: { display: "none" } }} />
+        <Tabs.Screen name="strategy/[id]" options={{ href: null, tabBarStyle: { display: "none" } }} />
+        <Tabs.Screen name="visual-symbols" options={{ href: null, tabBarStyle: { display: "none" } }} />
+        <Tabs.Screen name="story-builder" options={{ href: null, tabBarStyle: { display: "none" } }} />
+        <Tabs.Screen name="story/[id]" options={{ href: null, tabBarStyle: { display: "none" } }} />
       </Tabs>
     </ChildProvider>
   );
